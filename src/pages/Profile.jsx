@@ -8,7 +8,9 @@ import { db } from "../firebase"
 export const Profile = () => {
     const navigate = useNavigate()
     const [changeDetail,setChangeDetail] = useState(false)
+
     const auth = getAuth()
+    
     const [formData, setFormData] = useState({
         name: auth.currentUser.displayName,
         email: auth.currentUser.email,
