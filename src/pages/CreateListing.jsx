@@ -154,7 +154,7 @@ export const CreateListing =() => {
       toast.error("Images not uploaded");
       return;
     });
-
+    //make a json data for the firebase to read and write
     const formDataCopy = {
       ...formData,
       imgUrls,
@@ -162,10 +162,12 @@ export const CreateListing =() => {
       timestamp: serverTimestamp(),
       userRef: auth.currentUser.uid,
     };
+
     delete formDataCopy.images;
     !formDataCopy.offer && delete formDataCopy.discountedPrice;
     delete formDataCopy.latitude;
     delete formDataCopy.longitude;
+
     const docRef = await addDoc(collection(db, "listings"), formDataCopy);
     setLoading(false);
     toast.success("Listing created");

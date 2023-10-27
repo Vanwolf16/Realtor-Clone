@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { getAuth, updateProfile } from "firebase/auth"
 import { useNavigate } from "react-router"
 import { toast } from "react-toastify"
-import { collection, doc, getDocs, orderBy, query, updateDoc, where} from "firebase/firestore"
+import { collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc, where} from "firebase/firestore"
 import { db } from "../firebase"
 
 import {FcHome} from 'react-icons/fc'
@@ -57,25 +57,48 @@ export const Profile = () => {
 
     useEffect(() => {
         async function fetchUserListings() {
+          //db get the listing collection
           const listingRef = collection(db, "listings");
+          //Query it to get the user listing only
           const q = query(
             listingRef,
             where("userRef", "==", auth.currentUser.uid),
             orderBy("timestamp", "desc")
           );
+          //make a await function to getDocs
           const querySnap = await getDocs(q);
+          //make a empty array to get the data like on swift
           let listings = [];
+          //listing push
           querySnap.forEach((doc) => {
             return listings.push({
               id: doc.id,
               data: doc.data(),
             });
           });
+
           setListings(listings);
           setLoading(false);
         }
         fetchUserListings();
       }, [auth.currentUser.uid]);
+
+
+      async function onDelete(listingID) {
+        if (window.confirm("Are you sure you want to delete?")) {
+          await deleteDoc(doc(db, "listings", listingID));
+          const updatedListings = listings.filter(
+            (listing) => listing.id !== listingID
+          );
+          setListings(updatedListings);
+          toast.success("Successfully deleted the listing");
+        }
+      }
+
+      function onEdit(lisitingID){
+        navigate(`/edit-listing/${lisitingID}`)
+      }
+
 
     return(
         <>
@@ -129,7 +152,8 @@ export const Profile = () => {
                         <ul>
                             {listings.map((listing) => (
                                 <ListingItem key={listing.id}
-                                id={listing.id} listing={listing.data} />
+                                id={listing.id} listing={listing.data} onDelete={() => onDelete(listing.id)}
+                                onEdit={() => onEdit(listing.id)}/>
                             ))}
                         </ul>
                     </>
