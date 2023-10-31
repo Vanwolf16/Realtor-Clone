@@ -1,7 +1,9 @@
 
-export const Home = () => {
+import { Slider } from "../components/Slider"
 
+
+export const Home = () => {
     return(
-        <div>Home</div>
+        <Slider />
     )
 }
